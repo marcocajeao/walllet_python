@@ -2,28 +2,18 @@
 # Son las validaciones de los servicios rest, se validan los parametros obtenidos desde las llamadas externas rest
 
 import utils.errors as error
-import articles.crud_service as crud
+import wallet.crud_service as crud
 import utils.schema_validator as schemaValidator
 import numbers
 
 
 # Son validaciones sobre las propiedades que pueden actualizarse desde REST
-ARTICLE_UPDATE_SCHEMA = {
-    "name": {
-        "type": str,
-        "minLen": 1,
-        "maxLen": 60
-        },
-    "description": {
+TRANSACTION_UPDATE_SCHEMA = {
+    "observation": {
         "type": str,
         "maxLen": 2048
         },
-    "image": {
-        "type": str,
-        "minLen": 30,
-        "maxLen": 40
-        },
-    "price": {
+    "amount": {
         "type": numbers.Real,
         "min": 0
         },
@@ -34,7 +24,7 @@ ARTICLE_UPDATE_SCHEMA = {
 }
 
 
-def validateAddArticleParams(params):
+def validateWalletParams(params):
     """
     Valida los parametros para crear un objeto.\n
     params: dict<propiedad, valor> Article
@@ -45,7 +35,7 @@ def validateAddArticleParams(params):
     return schemaValidator.validateAndClean(ARTICLE_UPDATE_SCHEMA, params)
 
 
-def validateEditArticleParams(articleId, params):
+def validateEditWalletParams(articleId, params):
     """
     Valida los parametros para actualizar un objeto.\n
     params: dict<propiedad, valor> Article
@@ -53,10 +43,10 @@ def validateEditArticleParams(articleId, params):
     if (not articleId):
         raise error.InvalidArgument("_id", "Inválido")
 
-    return schemaValidator.validateAndClean(ARTICLE_UPDATE_SCHEMA, params)
+    return schemaValidator.validateAndClean(TRANSACTION_UPDATE_SCHEMA, params)
 
 
-def validateArticleExist(articleId):
-    article = crud.getArticle(articleId)
-    if("enabled" not in article or not article["enabled"]):
-        raise error.InvalidArgument("_id", "Inválido")
+def validateWalletFunds(user_id):
+    wallet = crud.getFunds(user_id)
+    if(wallet["balance"] == 0):
+        raise error.InvalidArgument("_id", "Without funds")

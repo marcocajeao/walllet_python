@@ -3,7 +3,7 @@
 import flask
 import numbers
 # import articles.crud_service as crud
-# import articles.find_service as find
+import wallet.find_service as find
 import utils.json_serializer as json
 import utils.errors as errors
 import utils.security as security
@@ -25,11 +25,11 @@ def init(app):
 
             # params = restValidator.validateAddArticleParams(params)
 
-            # result = crud.addArticle(params)
+            # result = find.addArticle(params)
 
             return json.dic_to_json({
                 "_id": "0xasd564wes4daSDx5165as5d4da65WKJsd44s",
-                "to_user_id": "4daSDx5165as5d4da65WKJ" 
+                "to_user_id": "4daSDx5165as5d4da65WKJ" ,
                 "amount": params["amount"],
                 "date": "2018-11-17",
                 "time": "17:46:45.009",
@@ -68,13 +68,11 @@ def init(app):
 
             # params = restValidator.validateAddArticleParams(params)
 
-            # result = crud.addArticle(params)
+            result = find.getFundsWallet(user_id)
 
             return json.dic_to_json({
-                "user_id": "WxksASDR445frk5215WKJsGFT3456G5484G5d4dsJ",
-                "balance": 5214.36,
-                "last_date_tx": "2018-11-19",
-                "last_time_tx": "11:25:35.958"
+                "user_id": user_id,
+                "balance": result
             })
         except Exception as err:
             return errors.handleError(err)
