@@ -7,53 +7,79 @@ import utils.errors as errors
 
 # Validaciones generales del esquema, se valida solo lo que el usuario puede cambiar
 TRANSACTION_DB_SCHEMA = {
-    "name": {
+    "amount": {
         "required": True,
-        "type": str,
-        "minLen": 1,
-        "maxLen": 60
+        "type": numbers.Real,
+        "min": 0
         },
     "description": {
         "required": False,
         "type": str,
         "maxLen": 2048
         },
-    "image": {
+    "type": {
+        "required": True,
+        "type": str,
+        "minLen": 1,
+        "maxLen": 12
+        },
+    "to_user_id": {
         "required": False,
         "type": str,
-        "minLen": 30,
-        "maxLen": 40
+        "minLen": 22,
+        "maxLen": 26
         },
-    "price": {
+    "from_user_id": {
         "required": False,
-        "type": numbers.Real,
-        "min": 0
-        },
-    "stock": {
-        "required": False,
-        "type": numbers.Integral,
-        "min": 0
+        "type": str,
+        "minLen": 22,
+        "maxLen": 26
         }
 }
 
 
-def newArticle():
+def newDeposit(user_id):
     """
-    Crea un nuevo articulo en blanco.\n
-    return dict<propiedad, valor> Articulo
+    Crea un nuevo deposito en blanco.\n
+    return dict<propiedad, valor> Wallet
     """
 
     return {
-        "name": "",
-        "description": "",
-        "image": "",
-        "price": 0.0,
-        "stock": 0,
-        "updated": datetime.datetime.utcnow(),
-        "created": datetime.datetime.utcnow(),
-        "enabled": True
+        "amount": 0.0,
+        "datetime": datetime.datetime.utcnow(),
+        "observation": "",
+        "type": "",
+        "to_user_id": user_id
     }
 
+def newWithdraw(user_id):
+    """
+    Crea un nuevo retiro en blanco.\n
+    return dict<propiedad, valor> Wallet
+    """
+
+    return {
+        "amount": 0.0,
+        "datetime": datetime.datetime.utcnow(),
+        "observation": "",
+        "type": "",
+        "from_user_id": user_id
+    }
+
+def newSend(user_id):
+    """
+    Crea un nuevo retiro en blanco.\n
+    return dict<propiedad, valor> Wallet
+    """
+
+    return {
+        "amount": 0.0,
+        "datetime": datetime.datetime.utcnow(),
+        "observation": "",
+        "type": "",
+        "to_user_id": "",
+        "from_user_id": user_id
+    }
 
 def validateSchema(document):
     err = validator.validateSchema(TRANSACTION_DB_SCHEMA, document)

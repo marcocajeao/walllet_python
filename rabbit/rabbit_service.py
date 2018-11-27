@@ -5,8 +5,8 @@ import utils.security as security
 import threading
 import utils.json_serializer as json
 import utils.config as config
-import articles.rest_validations as articleValidation
-import articles.crud_service as crud
+import wallet.rest_validations as walletValidation
+import wallet.crud_service as crud
 import utils.schema_validator as validator
 import traceback
 
@@ -142,7 +142,7 @@ def listenCatalog():
         }
     """
     """
-    article-data : Es una validación solicitada por Cart para validar si el articulo puede incluirse en el cart
+    article-data : Es una validación solicitada por Wallet para validar si el articulo puede incluirse en el cart
 
     @api {direct} catalog/article-exist Validación de Articulos
 
@@ -160,8 +160,8 @@ def listenCatalog():
             "articleId": "{articleId}",
         }
     """
-    EXCHANGE = "catalog"
-    QUEUE = "catalog"
+    EXCHANGE = "wallet"
+    QUEUE = "wallet"
 
     try:
         connection = pika.BlockingConnection(

@@ -7,7 +7,7 @@ config.read("config.ini")
 
 
 def get_server_port():
-    return int(get_property("ServerPort", 3002))
+    return int(get_property("ServerPort", 3020))
 
 
 def get_security_server_url():

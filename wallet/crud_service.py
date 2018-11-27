@@ -4,184 +4,152 @@ import utils.mongo as db
 import utils.errors as error
 import bson.objectid as bson
 import datetime
-import articles.article_schema as schema
+import wallet.transaction_schema as schema
 
 
-def getArticle(articleId):
+def addDeposit(params, user_id):
     """
-    Obtiene un articulo. \n
-    articleId: string ObjectId\n
-    return dict<propiedad, valor> Articulo\n
-    """
-    """
-    @api {get} /v1/articles/:articleId Buscar Artículo
-    @apiName Buscar Artículo
-    @apiGroup Articulos
-
-    @apiSuccessExample {json} Respuesta
-        HTTP/1.1 200 OK
-        {
-            "_id": "{id de articulo}"
-            "name": "{nombre del articulo}",
-            "description": "{descripción del articulo}",
-            "image": "{id de imagen}",
-            "price": {precio actual},
-            "stock": {stock actual}
-            "updated": {fecha ultima actualización}
-            "created": {fecha creación}
-            "enabled": {activo}
-        }
-
-    @apiUse Errors
-
-    """
-    try:
-        result = db.articles.find_one({"_id": bson.ObjectId(articleId)})
-        if (not result):
-            raise error.InvalidArgument("_id", "Document does not exists")
-        return result
-    except Exception:
-        raise error.InvalidArgument("_id", "Invalid object id")
-
-
-def addArticle(params):
-    """
-    Agrega un articulo.\n
-    params: dict<propiedad, valor> Articulo\n
-    return dict<propiedad, valor> Articulo
+    Agrega un deposito.\n
+    params: dict<propiedad, valor> Transaccion\n
+    return dict<propiedad, valor> Transaccion
     """
     """
-    @api {post} /v1/articles/ Crear Artículo
-    @apiName Crear Artículo
-    @apiGroup Articulos
+    @api {post} /v1/wallet Crear un deposito
+    @apiName Crear Transaccion
+    @apiGroup Wallet
 
     @apiUse AuthHeader
 
     @apiExample {json} Body
         {
-            "name": "{nombre del articulo}",
-            "description": "{descripción del articulo}",
-            "image": "{id de imagen}",
-            "price": {precio actual},
-            "stock": {stock actual}
+            "amount": "{importe}",
+            "observation": "{observacion de la transaccion}",
+            "type": "{tipo de transaccion}",
+            "to_user_id": {Para cual usuario},
+            "from_user_id": {Desde cual usuario}
         }
 
     @apiSuccessExample {json} Respuesta
         HTTP/1.1 200 OK
         {
-            "_id": "{id de articulo}"
-            "name": "{nombre del articulo}",
-            "description": "{descripción del articulo}",
-            "image": "{id de imagen}",
-            "price": {precio actual},
-            "stock": {stock actual}
-            "updated": {fecha ultima actualización}
-            "created": {fecha creación}
-            "enabled": {si esta activo}
+            "_id": "{id de Transaccion}"
+            "amount": "{importe}",
+            "datetime": "{fecha y hora de creacion}",
+            "observation": "{observacion de la transaccion}",
+            "type": "{tipo de transaccion}",
+            "to_user_id": {Para cual usuario},
+            "from_user_id": {Desde cual usuario}
         }
 
     @apiUse Errors
 
     """
-    return _addOrUpdateArticle(params)
 
-
-def updateArticle(articleId, params):
-    """
-    Actualiza un articulo. \n
-    articleId: string ObjectId\n
-    params: dict<propiedad, valor> Articulo\n
-    return dict<propiedad, valor> Articulo\n
-    """
-    """
-    @api {post} /v1/articles/:articleId Actualizar Artículo
-    @apiName Actualizar Artículo
-    @apiGroup Articulos
-
-    @apiUse AuthHeader
-
-    @apiExample {json} Body
-        {
-            "name": "{nombre del articulo}",
-            "description": "{descripción del articulo}",
-            "image": "{id de imagen}",
-            "price": {precio actual},
-            "stock": {stock actual}
-        }
-
-    @apiSuccessExample {json} Respuesta
-        HTTP/1.1 200 OK
-        {
-            "_id": "{id de articulo}"
-            "name": "{nombre del articulo}",
-            "description": "{descripción del articulo}",
-            "image": "{id de imagen}",
-            "price": {precio actual},
-            "stock": {stock actual}
-            "updated": {fecha ultima actualización}
-            "created": {fecha creación}
-            "enabled": {si esta activo}
-        }
-
-    @apiUse Errors
-
-    """
-    params["_id"] = articleId
-    return _addOrUpdateArticle(params)
-
-
-def delArticle(articleId):
-    """
-    Marca un articulo como invalido.\n
-    articleId: string ObjectId
-    """
-    """
-    Elimina un articulo : delArticle(articleId: string)
-
-    @api {delete} /articles/:articleId Eliminar Artículo
-    @apiName Eliminar Artículo
-    @apiGroup Articulos
-
-    @apiUse AuthHeader
-
-    @apiSuccessExample {json} 200 Respuesta
-        HTTP/1.1 200 OK
-
-    @apiUse Errors
-
-    """
-    article = getArticle(articleId)
-    article["updated"] = datetime.datetime.utcnow()
-    article["enabled"] = False
-    db.articles.save(article)
-
-
-def _addOrUpdateArticle(params):
-    """
-    Agrega o actualiza un articulo. \n
-    params: dict<property, value>) Articulo\n
-    return dict<propiedad, valor> Articulo
-    """
-    isNew = True
-
-    article = schema.newArticle()
-
-    if ("_id" in params):
-        isNew = False
-        article = getArticle(params["_id"])
+    transaction = schema.newDeposit(user_id)
 
     # Actualizamos los valores validos a actualizar
-    article.update(params)
+    transaction.update(params)
 
-    article["updated"] = datetime.datetime.utcnow()
+    schema.validateSchema(transaction)
 
-    schema.validateSchema(article)
+    transaction["_id"] = db.transaction.insert_one(transaction).inserted_id
 
-    if (not isNew):
-        del article["_id"]
-        r = db.articles.replace_one({"_id": bson.ObjectId(params["_id"])}, article)
-        article["_id"] = params["_id"]
-    else:
-        article["_id"] = db.articles.insert_one(article).inserted_id
+    return transaction
 
-    return article
+def addWithdraw(params, user_id):
+    """
+    Agrega un retiro.\n
+    params: dict<propiedad, valor> Transaccion\n
+    return dict<propiedad, valor> Transaccion
+    """
+    """
+    @api {post} /v1/wallet Crear un retiro
+    @apiName Crear Transaccion
+    @apiGroup Wallet
+
+    @apiUse AuthHeader
+
+    @apiExample {json} Body
+        {
+            "amount": "{importe}",
+            "observation": "{observacion de la transaccion}",
+            "type": "{tipo de transaccion}",
+            "to_user_id": {Para cual usuario},
+            "from_user_id": {Desde cual usuario}
+        }
+
+    @apiSuccessExample {json} Respuesta
+        HTTP/1.1 200 OK
+        {
+            "_id": "{id de Transaccion}"
+            "amount": "{importe}",
+            "datetime": "{fecha y hora de creacion}",
+            "observation": "{observacion de la transaccion}",
+            "type": "{tipo de transaccion}",
+            "to_user_id": {Para cual usuario},
+            "from_user_id": {Desde cual usuario}
+        }
+
+    @apiUse Errors
+
+    """
+
+    transaction = schema.newWithdraw(user_id)
+
+    # Actualizamos los valores validos a actualizar
+    transaction.update(params)
+
+    schema.validateSchema(transaction)
+
+    transaction["_id"] = db.transaction.insert_one(transaction).inserted_id
+
+    return transaction
+
+def addSend(params, user_id):
+    """
+    Agrega un Envio de fondos.\n
+    params: dict<propiedad, valor> Transaccion\n
+    return dict<propiedad, valor> Transaccion
+    """
+    """
+    @api {post} /v1/wallet Crear un Envio de fondos
+    @apiName Crear Transaccion
+    @apiGroup Wallet
+
+    @apiUse AuthHeader
+
+    @apiExample {json} Body
+        {
+            "amount": "{importe}",
+            "observation": "{observacion de la transaccion}",
+            "type": "{tipo de transaccion}",
+            "to_user_id": {Para cual usuario},
+            "from_user_id": {Desde cual usuario}
+        }
+
+    @apiSuccessExample {json} Respuesta
+        HTTP/1.1 200 OK
+        {
+            "_id": "{id de Transaccion}"
+            "amount": "{importe}",
+            "datetime": "{fecha y hora de creacion}",
+            "observation": "{observacion de la transaccion}",
+            "type": "{tipo de transaccion}",
+            "to_user_id": {Para cual usuario},
+            "from_user_id": {Desde cual usuario}
+        }
+
+    @apiUse Errors
+
+    """
+
+    transaction = schema.newSend(user_id)
+
+    # Actualizamos los valores validos a actualizar
+    transaction.update(params)
+
+    schema.validateSchema(transaction)
+
+    transaction["_id"] = db.transaction.insert_one(transaction).inserted_id
+
+    return transaction

@@ -5,6 +5,6 @@ import utils.config as config
 
 client = pymongo.MongoClient(config.get_database_server_url(), config.get_database_server_port())
 
-db = client['catalog']
+db = client['wallet']
 
-articles = db.articles
+transaction = db.transaction
