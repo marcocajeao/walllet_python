@@ -1,6 +1,6 @@
 # Microservicio de Wallet
 
-Es un microservicio que permite gestionar fondos de los usuarios registrados entre ellos consultar, depositar, retirar e enviar fondos de un usuario a otro. 
+Es un microservicio que permite gestionar fondos de los usuarios registrados. Entre ellos consultar, depositar, retirar y enviar fondos de un usuario a otro. 
 
 [Documentación de API](./README-API.md)
 
