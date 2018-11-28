@@ -1,17 +1,17 @@
-# Microservicio de Catalogo de Productos
+# Microservicio de Wallet
 
-Es un microservicio que permite manejar el catalogo de artículos, precios y stock, es un proyecto académico, esta simplificado al máximo; que en un ambiente de microservicios, tanto precios como stock deberian llevarse en un microservicio separado.
+Es un microservicio que permite gestionar fondos de los usuarios registrados entre ellos consultar, depositar, retirar e enviar fondos de un usuario a otro. 
 
 [Documentación de API](./README-API.md)
 
 La documentación de las api también se pueden consultar desde el home del microservicio
-que una vez levantado el servidor se puede navegar en [localhost:3002](http://localhost:3002/)
+que una vez levantado el servidor se puede navegar en [localhost:3020](http://localhost:3020/)
 
 ## Dependencias
 
 ### Auth
 
-El catálogo sólo puede usarse por usuario autenticados, algunas operaciones como agregar un artículo nuevo requieren que el usuario sea "admin", ver la arquitectura de microservicios de [ecommerce](https://github.com/nmarsollier/ecommerce).
+La wallet sólo puede usarse por usuario autenticados.
 
 ### MongoDb
 
@@ -19,7 +19,7 @@ Ver tutorial de instalación en [README.md](../README.md) en la raíz.
 
 ### RabbitMQ
 
-La comunicación con Catalog y Auth es a través de rabbit.
+La comunicación con Wallet y Auth es a través de rabbit.
 
 Ver tutorial de instalación en [README.md](../README.md) en la raíz.
 
@@ -66,7 +66,7 @@ pyenv global 2.7.6
 
 ### Python 3.6.5
 
-A partir de ahora todo lo que ejecutamos, va a ser dentro de la carpeta catalog
+A partir de ahora todo lo que ejecutamos, va a ser dentro de la carpeta wallet
 
 ```bash
 pyenv install 3.6.5
